@@ -1,6 +1,6 @@
 # 🧾 Manager.io — POS (Point of Sale) Extension
 
-> A free, self-contained Point-of-Sale terminal for [Manager.io](https://www.manager.io) — barcode scanning, cart, day register, receipts, and WhatsApp sharing, all in a single HTML file with no backend.
+> A free, self-contained Point-of-Sale terminal for [Manager.io](https://www.manager.io) — barcode scanning, cart, day register, receipts, and WhatsApp sharing, all in a single HTML file with no external dependencies or build step.
 
 ---
 
@@ -56,7 +56,7 @@ Once installed inside Manager.io:
 4. Adjust quantity/price per line as needed, pick or confirm the **customer**, and choose a **payment method**
 5. Click **🗄 Register** at the start of the day to open the cash register with an opening float; close it at day's end to reconcile and print the Day Closing Report
 6. Complete the sale — a reference number is generated automatically
-7. From the receipt screen, **print**, **download as PDF**, or **record the payment** back to Manager.io (the extension can perform write operations for creating receipts/invoices when used inside Manager)
+7. From the receipt screen, **print**, **download as PDF**, or **record the payment** back to Manager.io (when run inside Manager.io the extension can create Sales Invoices and Receipts via the postMessage bridge; when run standalone it will only generate the receipt locally)
 8. Toggle 🌙/☀️ to switch between dark and light themes at any time
 
 ---
@@ -67,11 +67,15 @@ Once installed inside Manager.io:
 |---|---|
 | File type | Single self-contained `index.html` file |
 | External libraries | None (no CDN dependencies) |
-| APIs used | `/api4/inventory-item-batch`, `/api4/customer-batch`, `/api4/bank-or-cash-account-batch`, `/api4/sales-invoice-batch`, plus starting balances, purchase invoices, debit/credit notes, and write-offs (for accurate stock computation) |
+| APIs used | `/api4/inventory-item-batch`, `/api4/customer-batch`, `/api4/bank-or-cash-account-batch`, `/api4/sales-invoice-batch`, plus calls for starting balances, purchase invoices, debit/credit notes, receipts, and related lookup endpoints |
 | Pagination | Full — loops all pages via `next_page_token` |
 | Framework | Vanilla HTML / CSS / JavaScript — no build step required |
-| Manager.io communication | `postMessage` API (standard extension protocol), with a direct-fetch fallback when running standalone for some helper operations |
-| Local storage | Day Register sessions are stored locally per calendar day; sales made outside this extension are not reflected in the register |
+| Manager.io communication | `postMessage` API (standard extension protocol) is used for read/write operations when running inside Manager.io. When running standalone the extension falls back to direct fetches for read-only helper operations where possible. |
+| Local storage | Day Register sessions are stored locally per calendar day; sales made outside this extension are not reflected in the register unless they are recorded back into Manager.io via the extension's write operations |
+
+Notes:
+- The extension fetches all pages of each batch endpoint to present a single searchable list in the POS UI.
+- Where write operations are available they are performed via the Manager.io extension bridge (postMessage) and will require appropriate permissions and a safe testing instance when experimenting.
 
 ---
 
@@ -82,16 +86,21 @@ This extension is under active development and currently runs in **Standalone (c
 - Inactive Cash & Bank accounts currently still appear in the payment method list
 - Tax rates (e.g. VAT, WHT) are not yet applied to POS sales
 - Displayed available stock quantity may not always match Manager's own item balance for complex scenarios
-- No dedicated barcode field/setup guidance yet for physical barcode scanners
+- No dedicated barcode field/setup guidance yet for physical barcode scanners (the barcode input works but some scanners may need configuration)
 - Non-inventory items and inventory kits are not yet sellable through the POS
 - No configurable default drawer account per payment method (currently defaults to the first cash account found)
 - No dedicated mobile view (desktop/tablet layout only for now)
+
+If you'd like, I can prioritize a follow-up to:
+- Hide inactive cash accounts from the payment list
+- Add tax calculation options
+- Add a mobile-first responsive CSS variant
 
 ---
 
 ## ⚠️ Disclaimer
 
-This extension is an independent, community-built tool and is **not officially affiliated with or endorsed by Manager.io**. It is provided free of charge, as-is. Always verify sales and financial figures against your official Manager.io reports before making business decisions.
+This extension is an independent, community-built tool and is **not officially affiliated with or endorsed by Manager.io**. It is provided free of charge, as-is. Always verify sales and financial data before relying on the extension in production.
 
 When installed inside Manager.io the POS can create Sales Invoices / Receipts (writes) via the postMessage bridge; exercise care when testing and use a safe business instance for development.
 
@@ -99,7 +108,7 @@ When installed inside Manager.io the POS can create Sales Invoices / Receipts (w
 
 ## 🛠️ Built With
 
-This extension was built using the **[Manager.io Developer Toolkit](https://github.com/ksl1816/manager-developer-toolkit-extenstion)** — a companion extension that lets you explore Manager.io API endpoints and generate AI prompts for building extensions like this one.
+This extension was built using the **[Manager.io Developer Toolkit](https://github.com/ksl1816/manager-developer-toolkit-extenstion)** — a companion extension that lets you explore Manager.io APIs, test extension messaging, and rapidly iterate on Manager.io extension development.
 
 ---
 
@@ -113,4 +122,4 @@ Free to use, modify, and share. Attribution appreciated but not required.
 
 **ksl1816** — [github.com/ksl1816](https://github.com/ksl1816)
 
-*Contributions, bug reports, and feature suggestions are welcome — open an issue or pull request.*
+Contributions, bug reports, and feature suggestions are welcome — open an issue or pull request.
