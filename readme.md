@@ -29,7 +29,7 @@
 1. Enable GitHub Pages on this repo *(Settings → Pages → Deploy from main branch)*
 2. Your extension URL will be:
    ```
-   https://ksl1816.github.io/manager-io-pos/
+   https://ksl1816.github.io/manager-io-point-of-sales/
    ```
 3. In Manager.io go to **Settings → Extensions → Add Custom Extension**
 4. Paste the URL above and save
@@ -56,7 +56,7 @@ Once installed inside Manager.io:
 4. Adjust quantity/price per line as needed, pick or confirm the **customer**, and choose a **payment method**
 5. Click **🗄 Register** at the start of the day to open the cash register with an opening float; close it at day's end to reconcile and print the Day Closing Report
 6. Complete the sale — a reference number is generated automatically
-7. From the receipt screen, **print**, **download as PDF**
+7. From the receipt screen, **print**, **download as PDF**, or **record the payment** back to Manager.io (the extension can perform write operations for creating receipts/invoices when used inside Manager)
 8. Toggle 🌙/☀️ to switch between dark and light themes at any time
 
 ---
@@ -65,19 +65,19 @@ Once installed inside Manager.io:
 
 | Property | Detail |
 |---|---|
-| File type | Single self-contained `.html` file |
+| File type | Single self-contained `index.html` file |
 | External libraries | None (no CDN dependencies) |
-| APIs used | `/api4/inventory-item-batch`, `/api4/customer-batch`, `/api4/bank-or-cash-account-batch`, `/api4/sales-invoice-batch`, plus starting balances, purchase invoices, debit/credit notes, and write-offs (for stock calculation) |
+| APIs used | `/api4/inventory-item-batch`, `/api4/customer-batch`, `/api4/bank-or-cash-account-batch`, `/api4/sales-invoice-batch`, plus starting balances, purchase invoices, debit/credit notes, and write-offs (for accurate stock computation) |
 | Pagination | Full — loops all pages via `next_page_token` |
 | Framework | Vanilla HTML / CSS / JavaScript — no build step required |
-| Manager.io communication | `postMessage` API (standard extension protocol), with a direct-fetch fallback |
+| Manager.io communication | `postMessage` API (standard extension protocol), with a direct-fetch fallback when running standalone for some helper operations |
 | Local storage | Day Register sessions are stored locally per calendar day; sales made outside this extension are not reflected in the register |
 
 ---
 
 ## ⚠️ Current Limitations / Status
 
-This extension is under active development and currently runs in **Standalone (cash sales) mode**. Known gaps being worked on:
+This extension is under active development and currently runs in **Standalone (cash sales) mode** by default. Known gaps being worked on:
 
 - Inactive Cash & Bank accounts currently still appear in the payment method list
 - Tax rates (e.g. VAT, WHT) are not yet applied to POS sales
@@ -92,6 +92,8 @@ This extension is under active development and currently runs in **Standalone (c
 ## ⚠️ Disclaimer
 
 This extension is an independent, community-built tool and is **not officially affiliated with or endorsed by Manager.io**. It is provided free of charge, as-is. Always verify sales and financial figures against your official Manager.io reports before making business decisions.
+
+When installed inside Manager.io the POS can create Sales Invoices / Receipts (writes) via the postMessage bridge; exercise care when testing and use a safe business instance for development.
 
 ---
 
